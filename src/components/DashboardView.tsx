@@ -23,7 +23,7 @@ interface DashboardViewProps {
   onOpenSharePointSync: () => void;
   onRefreshSharePoint?: () => void;
   isLiveSyncing?: boolean;
-  lastSyncTime: string;
+  lastSyncTime?: string;
 }
 
 export const DashboardView: React.FC<DashboardViewProps> = ({
@@ -36,7 +36,6 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   onOpenSharePointSync,
   onRefreshSharePoint,
   isLiveSyncing = false,
-  lastSyncTime,
 }) => {
   // Present issues (not yet resolved)
   const presentIssues = issues.filter(
@@ -58,10 +57,6 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             <span className="text-slate-500 mx-2">·</span>
             <span className="text-slate-300 font-mono text-[11px] truncate">
               Auto-updating from Scicom SharePoint
-            </span>
-            <span className="text-slate-500 mx-2">·</span>
-            <span className="text-emerald-400 font-mono text-[11px] tabular-nums font-semibold">
-              {lastSyncTime}
             </span>
           </div>
         </div>

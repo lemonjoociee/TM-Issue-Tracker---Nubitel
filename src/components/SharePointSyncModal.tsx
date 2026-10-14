@@ -22,7 +22,7 @@ interface SharePointSyncModalProps {
   issues: Issue[];
   summaries: MonthlySummary[];
   onSyncSuccess: (newIssues: Issue[], sourceInfo: string) => void;
-  lastSyncTime: string;
+  lastSyncTime?: string;
 }
 
 export const SharePointSyncModal: React.FC<SharePointSyncModalProps> = ({
@@ -31,7 +31,6 @@ export const SharePointSyncModal: React.FC<SharePointSyncModalProps> = ({
   issues,
   summaries,
   onSyncSuccess,
-  lastSyncTime,
 }) => {
   if (!isOpen) return null;
 
@@ -249,8 +248,8 @@ export const SharePointSyncModal: React.FC<SharePointSyncModalProps> = ({
                 </span>
               </div>
               <div>
-                <span className="text-slate-500 block">Last Sync:</span>
-                <span className="text-emerald-400 font-mono tabular-nums">{lastSyncTime}</span>
+                <span className="text-slate-500 block">Sync Status:</span>
+                <span className="text-emerald-400 font-medium">Real-Time Connected</span>
               </div>
             </div>
           </div>

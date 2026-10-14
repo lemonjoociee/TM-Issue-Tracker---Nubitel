@@ -33,7 +33,7 @@ export function computeDataHash(issues: Issue[]): string {
 let cachedState: LiveSharePointState = {
   issues: INITIAL_ISSUES,
   summaries: [],
-  lastSyncTime: 'Initial Baseline',
+  lastSyncTime: 'Connected',
   lastSyncIso: new Date().toISOString(),
   totalIssues: INITIAL_ISSUES.length,
   status: 'synced',
@@ -138,7 +138,7 @@ async function performSharePointFetch(targetUrl: string): Promise<LiveSharePoint
       cachedState = {
         issues: parsed.issues,
         summaries: parsed.summaries,
-        lastSyncTime: `Live Sync ${timeStr}`,
+        lastSyncTime: 'Connected',
         lastSyncIso: now.toISOString(),
         totalIssues: parsed.issues.length,
         status: 'synced',
