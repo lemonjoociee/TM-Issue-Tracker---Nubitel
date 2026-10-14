@@ -13,8 +13,11 @@ function netlifyFunctionsDevMiddleware(): Plugin {
 
         // CORS headers for dev API calls
         res.setHeader('Access-Control-Allow-Origin', '*');
-        res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+        res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Pragma, Cache-Control');
         res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
+        res.setHeader('Pragma', 'no-cache');
+        res.setHeader('Expires', '0');
 
         if (req.method === 'OPTIONS') {
           res.statusCode = 200;
@@ -37,6 +40,7 @@ function netlifyFunctionsDevMiddleware(): Plugin {
                 totalIssues: data.totalIssues,
                 status: data.status,
                 targetUrl: data.targetUrl,
+                dataHash: data.dataHash,
                 error: data.error,
               })
             );
@@ -78,6 +82,7 @@ function netlifyFunctionsDevMiddleware(): Plugin {
                   totalIssues: data.totalIssues,
                   status: data.status,
                   targetUrl: data.targetUrl,
+                  dataHash: data.dataHash,
                   error: data.error,
                 })
               );

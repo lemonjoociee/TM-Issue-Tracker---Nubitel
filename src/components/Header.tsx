@@ -1,5 +1,5 @@
 import React from 'react';
-import { Plus, Download, Upload, RefreshCw } from 'lucide-react';
+import { Plus, Download, RefreshCw } from 'lucide-react';
 
 interface HeaderProps {
   activeTab: 'dashboard' | 'tracker' | 'guidelines' | 'matrix';
@@ -19,11 +19,9 @@ export const Header: React.FC<HeaderProps> = ({
   setActiveTab,
   onOpenNewIssue,
   onExportCSV,
-  onImportCSV,
   onOpenSharePointSync,
   onRefreshSharePoint,
   isLiveSyncing = false,
-  onResetData,
   activeIssuesCount,
 }) => {
   return (
@@ -98,12 +96,22 @@ export const Header: React.FC<HeaderProps> = ({
 
           {/* Zone 3: Primary action & utilities */}
           <div className="flex items-center gap-2.5 shrink-0">
+            {/* Refresh SharePoint Button with active sync spinner */}
             <button
               onClick={onRefreshSharePoint || onOpenSharePointSync}
-              title="Real-time sync with Scicom SharePoint (Click to refresh now)"
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-emerald-300 bg-emerald-950/60 hover:bg-emerald-900/60 rounded-lg border border-emerald-500/40 transition-colors whitespace-nowrap cursor-pointer shadow-sm"
+              disabled={isLiveSyncing}
+              title="Real-time sync with Scicom SharePoint (Click to refresh immediately)"
+              className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border transition-all whitespace-nowrap shadow-sm ${
+                isLiveSyncing
+                  ? 'text-emerald-200 bg-emerald-950/80 border-emerald-500/60 cursor-wait opacity-90'
+                  : 'text-emerald-300 bg-emerald-950/60 hover:bg-emerald-900/70 border-emerald-500/40 cursor-pointer'
+              }`}
             >
-              <span className={`w-2 h-2 rounded-full bg-emerald-400 ${isLiveSyncing ? 'animate-ping' : 'animate-pulse'}`} />
+              {isLiveSyncing ? (
+                <RefreshCw className="w-3.5 h-3.5 animate-spin text-emerald-300 shrink-0" />
+              ) : (
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+              )}
               <span>{isLiveSyncing ? 'Syncing...' : 'SharePoint Live'}</span>
             </button>
 

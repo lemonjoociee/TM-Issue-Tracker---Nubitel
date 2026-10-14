@@ -3,7 +3,7 @@ import { refreshSharePointData } from './sharepointHelper';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization, Pragma, Cache-Control',
   'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
 };
 
@@ -37,6 +37,9 @@ export const handler: Handler = async (event: HandlerEvent, _context: HandlerCon
       headers: {
         ...corsHeaders,
         'Content-Type': 'application/json',
+        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+        Pragma: 'no-cache',
+        Expires: '0',
       },
       body: JSON.stringify({
         success: true,
@@ -47,6 +50,7 @@ export const handler: Handler = async (event: HandlerEvent, _context: HandlerCon
         totalIssues: refreshed.totalIssues,
         status: refreshed.status,
         targetUrl: refreshed.targetUrl,
+        dataHash: refreshed.dataHash,
         error: refreshed.error,
       }),
     };
@@ -56,6 +60,7 @@ export const handler: Handler = async (event: HandlerEvent, _context: HandlerCon
       headers: {
         ...corsHeaders,
         'Content-Type': 'application/json',
+        'Cache-Control': 'no-store, no-cache',
       },
       body: JSON.stringify({
         success: false,

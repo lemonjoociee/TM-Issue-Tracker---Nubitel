@@ -10,6 +10,7 @@ import {
   ShieldCheck,
   FileText,
   Search,
+  RefreshCw,
 } from 'lucide-react';
 
 interface DashboardViewProps {
@@ -69,9 +70,17 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           <button
             onClick={onRefreshSharePoint}
             disabled={isLiveSyncing}
-            className="px-3 py-1 bg-emerald-600/30 hover:bg-emerald-600/40 text-emerald-200 border border-emerald-500/50 rounded-lg font-semibold transition-colors cursor-pointer flex items-center gap-1.5"
+            className={`px-3 py-1 border rounded-lg font-semibold transition-all flex items-center gap-1.5 ${
+              isLiveSyncing
+                ? 'bg-emerald-950/80 border-emerald-500/60 text-emerald-200 cursor-wait opacity-90'
+                : 'bg-emerald-600/30 hover:bg-emerald-600/40 text-emerald-200 border border-emerald-500/50 cursor-pointer'
+            }`}
           >
-            <span className={`w-1.5 h-1.5 rounded-full bg-emerald-400 ${isLiveSyncing ? 'animate-spin' : ''}`} />
+            {isLiveSyncing ? (
+              <RefreshCw className="w-3 h-3 animate-spin text-emerald-300 shrink-0" />
+            ) : (
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" />
+            )}
             <span>{isLiveSyncing ? 'Syncing...' : 'Sync Now'}</span>
           </button>
           <a

@@ -11,6 +11,22 @@ export interface LiveSharePointState {
   status: 'synced' | 'syncing' | 'error';
   error: string | null;
   targetUrl: string;
+  dataHash: string;
+}
+
+// Compute lightweight fingerprint of issue dataset to detect real updates
+export function computeDataHash(issues: Issue[]): string {
+  let str = `${issues.length}:`;
+  for (let i = 0; i < issues.length; i += Math.max(1, Math.floor(issues.length / 20))) {
+    const item = issues[i];
+    str += `${item.id}|${item.status}|${item.priority}|${item.solvedDate || ''};`;
+  }
+  // Include last item specifically
+  if (issues.length > 0) {
+    const last = issues[issues.length - 1];
+    str += `${last.id}|${last.status}|${last.solvedDate || ''}`;
+  }
+  return str;
 }
 
 // In-memory cache across warm serverless container invocations
@@ -23,37 +39,46 @@ let cachedState: LiveSharePointState = {
   status: 'synced',
   error: null,
   targetUrl: SHAREPOINT_DIRECT_LINK,
+  dataHash: computeDataHash(INITIAL_ISSUES),
 };
 
 let lastFetchTimestamp = 0;
-const CACHE_TTL_MS = 25000; // 25 seconds cache TTL
+// 4-second internal cache TTL to prevent overwhelming SharePoint while allowing 5-10s live updates
+const CACHE_TTL_MS = 4000;
+
+// Mutex promise to deduplicate concurrent sync calls across multiple requests
+let activeSyncPromise: Promise<LiveSharePointState> | null = null;
 
 export function getDownloadUrl(webUrl: string): string {
   try {
     const u = new URL(webUrl);
     u.searchParams.set('download', '1');
+    u.searchParams.set('_t', Date.now().toString());
     return u.toString();
   } catch {
-    return SHAREPOINT_DOWNLOAD_URL;
+    return `${SHAREPOINT_DOWNLOAD_URL}&_t=${Date.now()}`;
   }
 }
 
 /**
  * Downloads and parses the live SharePoint workbook from Microsoft SharePoint Online.
- * Falls back gracefully to baseline data if SharePoint authentication cookie or network is blocked.
+ * Bypasses intermediate proxy and CDN caches using cache-busting headers.
  */
-export async function syncFromSharePoint(targetUrl: string = cachedState.targetUrl): Promise<LiveSharePointState> {
+async function performSharePointFetch(targetUrl: string): Promise<LiveSharePointState> {
   const downloadUrl = getDownloadUrl(targetUrl);
   cachedState.status = 'syncing';
   cachedState.targetUrl = targetUrl;
 
   try {
-    // Step 1: Follow initial request to inspect redirects and cookies
+    // Step 1: Follow initial request to inspect redirects and cookies with cache-control headers
     const res1 = await fetch(downloadUrl, {
       redirect: 'manual',
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko)',
         Accept: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/octet-stream,*/*',
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        Pragma: 'no-cache',
+        Expires: '0',
       },
     });
 
@@ -65,7 +90,13 @@ export async function syncFromSharePoint(targetUrl: string = cachedState.targetU
     let fileBuffer: Buffer | null = null;
 
     if (location) {
-      const nextUrl = location.startsWith('http') ? location : `https://scicommsc-my.sharepoint.com${location}`;
+      let nextUrl = location.startsWith('http') ? location : `https://scicommsc-my.sharepoint.com${location}`;
+      // Add cache buster to redirected URL if not present
+      if (!nextUrl.includes('_t=')) {
+        const separator = nextUrl.includes('?') ? '&' : '?';
+        nextUrl = `${nextUrl}${separator}_t=${Date.now()}`;
+      }
+
       const cookieHeader = setCookies.map((c: string) => c.split(';')[0]).join('; ');
 
       const res2 = await fetch(nextUrl, {
@@ -73,6 +104,9 @@ export async function syncFromSharePoint(targetUrl: string = cachedState.targetU
           Cookie: cookieHeader,
           'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko)',
           Accept: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/octet-stream,*/*',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          Pragma: 'no-cache',
+          Expires: '0',
         },
       });
 
@@ -99,6 +133,8 @@ export async function syncFromSharePoint(targetUrl: string = cachedState.targetU
     if (parsed.issues.length > 0) {
       const now = new Date();
       const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      const newHash = computeDataHash(parsed.issues);
+
       cachedState = {
         issues: parsed.issues,
         summaries: parsed.summaries,
@@ -108,6 +144,7 @@ export async function syncFromSharePoint(targetUrl: string = cachedState.targetU
         status: 'synced',
         error: null,
         targetUrl,
+        dataHash: newHash,
       };
       lastFetchTimestamp = Date.now();
       return cachedState;
@@ -126,6 +163,23 @@ export async function syncFromSharePoint(targetUrl: string = cachedState.targetU
   }
 
   return cachedState;
+}
+
+/**
+ * Downloads and parses the live SharePoint workbook from Microsoft SharePoint Online.
+ * Thread-safe with request deduplication and concurrent call throttling.
+ */
+export async function syncFromSharePoint(targetUrl: string = cachedState.targetUrl): Promise<LiveSharePointState> {
+  // If a sync is already executing, wait for it rather than creating overlapping calls
+  if (activeSyncPromise) {
+    return activeSyncPromise;
+  }
+
+  activeSyncPromise = performSharePointFetch(targetUrl).finally(() => {
+    activeSyncPromise = null;
+  });
+
+  return activeSyncPromise;
 }
 
 export async function getLiveSharePointData(forceRefresh = false): Promise<LiveSharePointState> {
@@ -148,6 +202,7 @@ export function getSharePointStatus(): {
   lastSyncTime: string;
   lastSyncIso: string;
   totalIssues: number;
+  dataHash: string;
   error: string | null;
 } {
   return {
@@ -157,6 +212,7 @@ export function getSharePointStatus(): {
     lastSyncTime: cachedState.lastSyncTime,
     lastSyncIso: cachedState.lastSyncIso,
     totalIssues: cachedState.totalIssues,
+    dataHash: cachedState.dataHash,
     error: cachedState.error,
   };
 }

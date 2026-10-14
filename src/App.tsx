@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { Issue, MonthlySummary, MonthName } from './types/issue';
 import { INITIAL_ISSUES } from './data/initialIssues';
 import { Header } from './components/Header';
@@ -16,6 +16,30 @@ import { CheckCircle2, AlertTriangle, Info, Bell } from 'lucide-react';
 const STORAGE_KEY = 'tm_noc_issue_tracker_data_v1';
 const LIVE_ENDPOINT = '/.netlify/functions/sharepoint-live';
 const REFRESH_ENDPOINT = '/.netlify/functions/sharepoint-refresh';
+
+// Fast deep comparator to ensure only real SharePoint modifications trigger re-renders
+function areIssuesEquivalent(current: Issue[], incoming: Issue[]): boolean {
+  if (current.length !== incoming.length) return false;
+  for (let i = 0; i < current.length; i++) {
+    const c = current[i];
+    const n = incoming[i];
+    if (
+      c.id !== n.id ||
+      c.status !== n.status ||
+      c.priority !== n.priority ||
+      c.solvedDate !== n.solvedDate ||
+      c.solvedTime !== n.solvedTime ||
+      c.longDescription !== n.longDescription ||
+      c.resolution !== n.resolution ||
+      c.actionTaken !== n.actionTaken ||
+      c.rcaStatus !== n.rcaStatus ||
+      c.issueArea !== n.issueArea
+    ) {
+      return false;
+    }
+  }
+  return true;
+}
 
 export default function App() {
   // Load issues from localStorage or initial dataset
@@ -41,7 +65,7 @@ export default function App() {
   const [selectedIssue, setSelectedIssue] = useState<Issue | null>(null);
   const [isNewIssueModalOpen, setIsNewIssueModalOpen] = useState(false);
   const [isSharePointModalOpen, setIsSharePointModalOpen] = useState(false);
-  const [lastSyncTime, setLastSyncTime] = useState<string>('Live Netlify Sync');
+  const [lastSyncTime, setLastSyncTime] = useState<string>('Live SharePoint Sync');
 
   // Filters passed to tracker view
   const [trackerFilter, setTrackerFilter] = useState<{
@@ -59,6 +83,13 @@ export default function App() {
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
+  // Synchronization locking & throttling refs
+  const isSyncingRef = useRef(false);
+  const lastSyncCompletedAtRef = useRef(0);
+  const pollingTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const currentIssuesRef = useRef<Issue[]>(issues);
+  currentIssuesRef.current = issues;
+
   // Save to localStorage whenever issues change
   useEffect(() => {
     try {
@@ -68,88 +99,150 @@ export default function App() {
     }
   }, [issues]);
 
-  const showToast = (text: string, type: 'success' | 'info' | 'warn' = 'success') => {
+  const showToast = useCallback((text: string, type: 'success' | 'info' | 'warn' = 'success') => {
     setToastMessage({ text, type });
     setTimeout(() => {
       setToastMessage(null);
     }, 4000);
-  };
+  }, []);
 
-  // Automated polling to Netlify Functions for real-time SharePoint sync
-  const pollSharePoint = async (silent = false) => {
-    try {
-      if (!silent) setIsLiveSyncing(true);
-      const res = await fetch(LIVE_ENDPOINT);
-      if (res.ok) {
-        const data = await res.json();
-        if (data.success && Array.isArray(data.issues) && data.issues.length > 0) {
-          setIssues(data.issues);
-          setLastSyncTime(data.lastSyncTime || 'Just now');
-          if (!silent) {
-            showToast(`Real-time synced with SharePoint: ${data.issues.length} issues up-to-date.`, 'success');
+  /**
+   * Unified SharePoint synchronization engine with concurrency locking,
+   * request throttling, cache busting, and diff detection.
+   */
+  const performSharePointSync = useCallback(
+    async (options: { isManual?: boolean; force?: boolean } = {}) => {
+      const { isManual = false, force = false } = options;
+
+      // 1. Concurrency guard: Prevent overlapping sync operations
+      if (isSyncingRef.current) {
+        return;
+      }
+
+      // 2. Throttling guard: Prevent burst calls (e.g. rapid focus + visibilitychange events within 2 seconds)
+      const now = Date.now();
+      if (!isManual && now - lastSyncCompletedAtRef.current < 2000) {
+        return;
+      }
+
+      isSyncingRef.current = true;
+      setIsLiveSyncing(true);
+
+      try {
+        const endpoint = isManual ? REFRESH_ENDPOINT : LIVE_ENDPOINT;
+        const queryParams = new URLSearchParams({
+          _t: now.toString(),
+          force: force ? 'true' : 'false',
+        });
+
+        const fetchOptions: RequestInit = {
+          method: isManual ? 'POST' : 'GET',
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            Pragma: 'no-cache',
+            Expires: '0',
+          },
+        };
+
+        const res = await fetch(`${endpoint}?${queryParams.toString()}`, fetchOptions);
+
+        if (res.ok) {
+          const data = await res.json();
+          if (data.success && Array.isArray(data.issues) && data.issues.length > 0) {
+            const hasActualUpdates = !areIssuesEquivalent(currentIssuesRef.current, data.issues);
+
+            if (hasActualUpdates) {
+              // Only update state if real SharePoint changes occurred (avoids unnecessary re-renders)
+              setIssues(data.issues);
+              if (isManual) {
+                showToast(`SharePoint updated: ${data.issues.length} incidents synchronized.`, 'success');
+              }
+            } else if (isManual) {
+              showToast(`SharePoint is already up-to-date (${data.issues.length} incidents).`, 'info');
+            }
+
+            if (data.lastSyncTime) {
+              setLastSyncTime(data.lastSyncTime);
+            }
+          } else if (isManual) {
+            showToast('SharePoint returned no new updates.', 'info');
           }
+        } else if (isManual) {
+          showToast(`SharePoint sync returned HTTP ${res.status}`, 'warn');
         }
-      }
-    } catch (e) {
-      console.warn('SharePoint Netlify Function poll notice:', e);
-    } finally {
-      if (!silent) setIsLiveSyncing(false);
-    }
-  };
-
-  const triggerManualRefresh = async () => {
-    setIsLiveSyncing(true);
-    try {
-      const res = await fetch(REFRESH_ENDPOINT, { method: 'POST' });
-      if (res.ok) {
-        const data = await res.json();
-        if (data.success && Array.isArray(data.issues) && data.issues.length > 0) {
-          setIssues(data.issues);
-          setLastSyncTime(data.lastSyncTime || 'Just now');
-          showToast(`SharePoint refreshed: ${data.issues.length} issues updated!`, 'success');
-        } else {
-          showToast('SharePoint refreshed.', 'info');
+      } catch (e: any) {
+        console.warn('[SharePoint Live Sync]', e?.message || e);
+        if (isManual) {
+          showToast('Could not reach SharePoint. Retrying automatically...', 'warn');
         }
-      } else {
-        showToast('SharePoint refresh returned non-200 status.', 'warn');
+      } finally {
+        isSyncingRef.current = false;
+        lastSyncCompletedAtRef.current = Date.now();
+        setIsLiveSyncing(false);
       }
-    } catch (e) {
-      console.error(e);
-      showToast('Could not refresh from SharePoint.', 'warn');
-    } finally {
-      setIsLiveSyncing(false);
-    }
-  };
+    },
+    [showToast]
+  );
 
+  // Manual refresh triggered by user clicking the SharePoint sync button
+  const triggerManualRefresh = useCallback(() => {
+    performSharePointSync({ isManual: true, force: true });
+  }, [performSharePointSync]);
+
+  /**
+   * Lifecycle & Polling Controller:
+   * - 5-second polling interval for active/visible browser tabs.
+   * - Pauses polling when the tab is hidden to conserve bandwidth & battery.
+   * - Forces immediate sync when tab returns to visible or window gains focus.
+   */
   useEffect(() => {
-    // 1. Initial sync on mount
-    pollSharePoint(true);
-
-    // 2. Periodic polling every 30 seconds (replacing Server-Sent Events)
-    const intervalId = setInterval(() => {
-      pollSharePoint(true);
-    }, 30000);
-
-    // 3. Instant re-sync whenever user returns to the tab after editing in SharePoint
-    const handleFocus = () => {
-      pollSharePoint(true);
+    // Helper to start 5-second polling
+    const startPolling = () => {
+      if (pollingTimerRef.current) clearInterval(pollingTimerRef.current);
+      pollingTimerRef.current = setInterval(() => {
+        if (document.visibilityState === 'visible') {
+          performSharePointSync({ isManual: false, force: false });
+        }
+      }, 5000); // 5 seconds polling interval for active tabs
     };
 
+    // Helper to pause polling
+    const stopPolling = () => {
+      if (pollingTimerRef.current) {
+        clearInterval(pollingTimerRef.current);
+        pollingTimerRef.current = null;
+      }
+    };
+
+    // 1. Initial sync on application mount
+    performSharePointSync({ isManual: false, force: true });
+    startPolling();
+
+    // 2. Tab visibility changes: pause when hidden, force instant sync when visible
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
-        pollSharePoint(true);
+        performSharePointSync({ isManual: false, force: true });
+        startPolling();
+      } else {
+        stopPolling();
       }
     };
 
-    window.addEventListener('focus', handleFocus);
+    // 3. Window focus: force instant sync when user returns from SharePoint browser tab
+    const handleWindowFocus = () => {
+      performSharePointSync({ isManual: false, force: true });
+    };
+
     document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', handleWindowFocus);
 
     return () => {
-      clearInterval(intervalId);
-      window.removeEventListener('focus', handleFocus);
+      stopPolling();
       document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', handleWindowFocus);
     };
-  }, []);
+  }, [performSharePointSync]);
 
   // Recompute monthly summaries dynamically from state
   const monthlySummaries: MonthlySummary[] = useMemo(() => {
@@ -240,8 +333,8 @@ export default function App() {
 
   const handleSharePointSyncSuccess = (newIssues: Issue[], sourceInfo: string) => {
     setIssues(newIssues);
-    const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    setLastSyncTime(`Synced at ${now}`);
+    const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    setLastSyncTime(`Live Sync ${now}`);
     showToast(`SharePoint sync successful: ${sourceInfo}`, 'success');
   };
 
