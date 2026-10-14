@@ -1,0 +1,36 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+  functions = "netlify/functions"
+
+[functions]
+  node_bundler = "esbuild"
+
+# Direct API path rewrites to Netlify Serverless Functions
+[[redirects]]
+  from = "/api/sharepoint/live"
+  to = "/.netlify/functions/sharepoint-live"
+  status = 200
+
+[[redirects]]
+  from = "/api/sharepoint/refresh"
+  to = "/.netlify/functions/sharepoint-refresh"
+  status = 200
+
+[[redirects]]
+  from = "/api/sharepoint/status"
+  to = "/.netlify/functions/sharepoint-status"
+  status = 200
+
+# Client-Side SPA fallback routing (must be placed after function rewrites)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "SAMEORIGIN"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
