@@ -1,1 +1,39 @@
 @import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-tm-red: #D71920;
+  --color-tm-red-hover: #BF151B;
+  --color-tm-red-active: #A31015;
+  --color-tm-darkgrey: #4A4A4A;
+  --color-tm-lightgrey: #F5F5F5;
+  --color-tm-charcoal: #2A2A2A;
+  --color-tm-border: #E5E5E5;
+}
+
+:root {
+  --tm-red: #D71920;
+  --tm-dark-grey: #4A4A4A;
+  --tm-light-grey: #F5F5F5;
+  --tm-white: #FFFFFF;
+}
+
+/* Custom scrollbar for high-density enterprise tables */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(156, 163, 175, 0.4);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #D71920;
+}

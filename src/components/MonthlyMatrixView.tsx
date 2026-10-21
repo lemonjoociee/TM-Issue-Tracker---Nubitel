@@ -57,7 +57,7 @@ export const MonthlyMatrixView: React.FC<MonthlyMatrixViewProps> = ({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <Calendar className="w-5 h-5 text-orange-500" />
+            <Calendar className="w-5 h-5 text-[#D71920]" />
             <h1 className="text-xl font-bold text-white tracking-tight">Monthly Performance Matrix</h1>
           </div>
           <p className="text-xs text-slate-400 mt-1">
@@ -98,7 +98,7 @@ export const MonthlyMatrixView: React.FC<MonthlyMatrixViewProps> = ({
                   onClick={() => onSelectMonth(s.month)}
                   className="hover:bg-slate-800/40 transition-colors cursor-pointer group"
                 >
-                  <td className="py-3.5 px-4 font-sans font-bold text-slate-200 group-hover:text-orange-400">
+                  <td className="py-3.5 px-4 font-sans font-bold text-slate-200 group-hover:text-[#D71920]">
                     <div className="flex items-center gap-2">
                       <span>{s.month} 2026</span>
                       <span className="text-[10px] text-slate-500 font-mono font-normal">
@@ -159,7 +159,7 @@ export const MonthlyMatrixView: React.FC<MonthlyMatrixViewProps> = ({
                 <td className="py-4 px-3 text-right text-emerald-400 tabular-nums">33</td>
                 <td className="py-4 px-3 text-right text-amber-400 tabular-nums">23</td>
                 <td className="py-4 px-4 text-right text-slate-300 tabular-nums">99</td>
-                <td className="py-4 px-4 text-right text-orange-400 tabular-nums">72.8h</td>
+                <td className="py-4 px-4 text-right text-[#D71920] tabular-nums font-bold">72.8h</td>
               </tr>
             </tbody>
           </table>
@@ -204,7 +204,7 @@ export const MonthlyMatrixView: React.FC<MonthlyMatrixViewProps> = ({
 
                 <button
                   onClick={() => onSelectMonth(s.month)}
-                  className="text-xs font-medium text-orange-400 hover:text-orange-300 flex items-center gap-1 transition-colors cursor-pointer"
+                  className="text-xs font-semibold text-[#D71920] hover:underline flex items-center gap-1 transition-colors cursor-pointer"
                 >
                   <span>Filter issues for {s.month}</span>
                   <ArrowRight className="w-3.5 h-3.5" />

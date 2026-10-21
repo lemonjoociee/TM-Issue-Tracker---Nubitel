@@ -57,9 +57,9 @@ export const GuidelinesView: React.FC<GuidelinesViewProps> = ({
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <BookOpen className="w-5 h-5 text-orange-500" />
+            <BookOpen className="w-5 h-5 text-[#D71920]" />
             <h1 className="text-xl font-bold text-white tracking-tight">
-              Operational Guidelines & RCA Knowledge Base
+              Operational Guidelines &amp; RCA Knowledge Base
             </h1>
           </div>
           <p className="text-xs text-slate-400 mt-1">
@@ -82,14 +82,14 @@ export const GuidelinesView: React.FC<GuidelinesViewProps> = ({
             placeholder="Search symptoms, root causes, or modules (e.g. memory, spam, Nubitel, license, DM lag, graph api)..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-slate-950 border border-slate-800 rounded-lg pl-10 pr-4 py-2.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
+            className="w-full bg-slate-950 border border-slate-800 rounded-lg pl-10 pr-4 py-2.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-[#D71920] focus:ring-1 focus:ring-[#D71920]"
           />
         </div>
 
         {/* Quick Symptom Chips */}
         <div className="flex flex-wrap items-center gap-2 pt-1 text-xs">
           <span className="text-slate-500 flex items-center gap-1">
-            <Zap className="w-3.5 h-3.5 text-orange-400" />
+            <Zap className="w-3.5 h-3.5 text-[#D71920]" />
             <span>Common issues:</span>
           </span>
           {quickSymptoms.map((symptom) => (
@@ -104,7 +104,7 @@ export const GuidelinesView: React.FC<GuidelinesViewProps> = ({
           {searchQuery && (
             <button
               onClick={() => setSearchQuery('')}
-              className="text-xs text-orange-400 hover:text-orange-300 underline ml-2 cursor-pointer"
+              className="text-xs text-[#D71920] hover:underline ml-2 cursor-pointer"
             >
               Clear search
             </button>
@@ -115,9 +115,9 @@ export const GuidelinesView: React.FC<GuidelinesViewProps> = ({
         <div className="flex flex-wrap gap-2 pt-2 border-t border-slate-800/80">
           <button
             onClick={() => setSelectedCategory('all')}
-            className={`px-3 py-1 text-xs font-medium rounded-lg transition-colors cursor-pointer ${
+            className={`px-3 py-1 text-xs font-semibold rounded-lg transition-colors cursor-pointer ${
               selectedCategory === 'all'
-                ? 'bg-orange-600 text-white'
+                ? 'bg-[#D71920] text-white shadow-sm'
                 : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'
             }`}
           >
@@ -127,9 +127,9 @@ export const GuidelinesView: React.FC<GuidelinesViewProps> = ({
             <button
               key={cat}
               onClick={() => setSelectedCategory(cat)}
-              className={`px-3 py-1 text-xs font-medium rounded-lg transition-colors cursor-pointer ${
+              className={`px-3 py-1 text-xs font-semibold rounded-lg transition-colors cursor-pointer ${
                 selectedCategory === cat
-                  ? 'bg-orange-600 text-white'
+                  ? 'bg-[#D71920] text-white shadow-sm'
                   : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'
               }`}
             >
@@ -160,7 +160,7 @@ export const GuidelinesView: React.FC<GuidelinesViewProps> = ({
                   {/* Header info */}
                   <div className="flex items-center justify-between text-xs mb-2.5">
                     <div className="flex items-center gap-2">
-                      <span className="font-mono text-orange-400 font-bold">{playbook.id}</span>
+                      <span className="font-mono text-[#D71920] font-bold">{playbook.id}</span>
                       <span className="text-slate-500">·</span>
                       <span className="text-slate-400">{playbook.category}</span>
                     </div>
@@ -241,7 +241,7 @@ export const GuidelinesView: React.FC<GuidelinesViewProps> = ({
                         <button
                           key={issue.id}
                           onClick={() => onSelectIssue(issue)}
-                          className="font-mono text-[11px] px-2 py-0.5 rounded bg-slate-800 hover:bg-orange-600 text-slate-300 hover:text-white transition-colors cursor-pointer border border-slate-700"
+                          className="font-mono text-[11px] px-2 py-0.5 rounded bg-slate-800 hover:bg-[#D71920] text-slate-300 hover:text-white transition-colors cursor-pointer border border-slate-700"
                           title={`Click to view incident #${issue.id}: ${issue.longDescription}`}
                         >
                           #{issue.id}

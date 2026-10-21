@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { Issue, Priority, IssueStatus } from '../types/issue';
 import { OPERATIONAL_GUIDELINES } from '../data/guidelines';
-import { X, Plus, AlertCircle, Lightbulb, ShieldAlert } from 'lucide-react';
+import { X, Plus, AlertCircle, AlertTriangle, Lightbulb, ShieldAlert } from 'lucide-react';
 
 interface NewIssueModalProps {
   isOpen: boolean;
   onClose: () => void;
   nextId: number;
   onAddIssue: (newIssue: Issue) => void;
+  existingIssues?: Issue[];
 }
 
 export const NewIssueModal: React.FC<NewIssueModalProps> = ({
@@ -15,6 +16,7 @@ export const NewIssueModal: React.FC<NewIssueModalProps> = ({
   onClose,
   nextId,
   onAddIssue,
+  existingIssues = [],
 }) => {
   if (!isOpen) return null;
 
@@ -25,14 +27,26 @@ export const NewIssueModal: React.FC<NewIssueModalProps> = ({
 
   const [priority, setPriority] = useState<Priority>('P2');
   const [issueArea, setIssueArea] = useState('Email');
+  const [callId, setCallId] = useState('');
+  const [customer, setCustomer] = useState('Telekom Malaysia');
+  const [location, setLocation] = useState('Kuala Lumpur NOC');
   const [reportedBy, setReportedBy] = useState('Nurul Atikah Binti Ustaz Yaakop');
   const [contactTeam, setContactTeam] = useState('Harveet');
+  const [affectedUser, setAffectedUser] = useState('');
+  const [userEmail, setUserEmail] = useState('');
   const [status, setStatus] = useState<IssueStatus>('Open');
   const [longDescription, setLongDescription] = useState('');
   const [expectedResult, setExpectedResult] = useState('');
   const [impact, setImpact] = useState('');
   const [evidenceLink, setEvidenceLink] = useState('');
   const [trackerLabel, setTrackerLabel] = useState('System / Application level issue');
+
+  // Duplicate Call ID detection
+  const duplicateMatch = callId.trim()
+    ? existingIssues.find(
+        (i) => i.callId && i.callId.trim().toLowerCase() === callId.trim().toLowerCase()
+      )
+    : null;
 
   // Suggest relevant guideline as user types
   const matchingPlaybooks = OPERATIONAL_GUIDELINES.filter((g) => {
@@ -58,6 +72,12 @@ export const NewIssueModal: React.FC<NewIssueModalProps> = ({
 
     const newIssue: Issue = {
       id: nextId,
+      ticketId: `INC-2026-${String(nextId).padStart(5, '0')}`,
+      callId: callId.trim() || undefined,
+      customer: customer.trim() || 'Telekom Malaysia',
+      location: location.trim() || 'Kuala Lumpur NOC',
+      affectedUser: affectedUser.trim() || undefined,
+      userEmail: userEmail.trim() || undefined,
       reportedDate: defaultDate,
       reportedTime: defaultTime,
       solvedDate: '',
@@ -66,10 +86,12 @@ export const NewIssueModal: React.FC<NewIssueModalProps> = ({
       contactTeam,
       priority,
       issueArea,
+      service: issueArea,
       status,
       longDescription,
       expectedResult,
-      impact,
+      impact: impact.trim() || `${priority} operational impact`,
+      businessImpact: impact.trim() || undefined,
       evidenceLink,
       resolvedDateTime: '',
       resolution: '',
@@ -92,7 +114,7 @@ export const NewIssueModal: React.FC<NewIssueModalProps> = ({
         {/* Header */}
         <div className="px-6 py-4 bg-slate-950/80 border-b border-slate-800 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-orange-500 animate-pulse" />
+            <span className="w-2.5 h-2.5 rounded-full bg-[#D71920] animate-pulse" />
             <h2 className="text-base font-bold text-white tracking-tight">
               Log Present Incident (#{nextId})
             </h2>
@@ -107,6 +129,66 @@ export const NewIssueModal: React.FC<NewIssueModalProps> = ({
 
         {/* Form Body */}
         <form onSubmit={handleSubmit} className="px-6 py-5 overflow-y-auto space-y-4 text-xs text-slate-300">
+          {/* Duplicate Call ID Warning Alert */}
+          {duplicateMatch && (
+            <div className="p-3 rounded-xl bg-amber-500/15 border border-amber-500/40 text-amber-200 text-xs flex items-start gap-2.5 animate-in fade-in duration-200">
+              <AlertTriangle className="w-4 h-4 shrink-0 text-amber-400 mt-0.5" />
+              <div>
+                <span className="font-bold text-amber-300">Duplicate Call ID Detected:</span> Call ID{' '}
+                <span className="font-mono font-bold text-white bg-amber-900/40 px-1 py-0.5 rounded">
+                  {callId}
+                </span>{' '}
+                already exists in Incident #{duplicateMatch.id} ({duplicateMatch.issueArea} - {duplicateMatch.status}). Authorized NOC users may continue or review the existing record before continuing.
+              </div>
+            </div>
+          )}
+
+          {/* Section A: Call ID & Customer Info */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+              <label className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block mb-1">
+                Call ID / Ticket Ref
+              </label>
+              <input
+                type="text"
+                value={callId}
+                onChange={(e) => setCallId(e.target.value)}
+                placeholder="e.g. CALL-98421 or ESC-001"
+                className={`w-full bg-slate-950 border rounded-lg p-2.5 text-xs text-slate-200 focus:outline-none ${
+                  duplicateMatch
+                    ? 'border-amber-500 focus:border-amber-400'
+                    : 'border-slate-700 focus:border-[#D71920]'
+                }`}
+              />
+            </div>
+
+            <div>
+              <label className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block mb-1">
+                Customer Name
+              </label>
+              <input
+                type="text"
+                value={customer}
+                onChange={(e) => setCustomer(e.target.value)}
+                placeholder="e.g. Telekom Malaysia, Nubitel"
+                className="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-200 focus:outline-none focus:border-[#D71920]"
+              />
+            </div>
+
+            <div>
+              <label className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block mb-1">
+                Site / Location
+              </label>
+              <input
+                type="text"
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                placeholder="e.g. Menara TM, Cyberjaya, JB"
+                className="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-200 focus:outline-none focus:border-[#D71920]"
+              />
+            </div>
+          </div>
+
           {/* Priority & Area */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
@@ -116,7 +198,7 @@ export const NewIssueModal: React.FC<NewIssueModalProps> = ({
               <select
                 value={priority}
                 onChange={(e) => setPriority(e.target.value as Priority)}
-                className="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-200 focus:outline-none focus:border-orange-500 cursor-pointer"
+                className="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-200 focus:outline-none focus:border-[#D71920] cursor-pointer"
               >
                 <option value="P1">P1 - Critical (Immediate SLA Triage)</option>
                 <option value="P2">P2 - High (Degraded Service)</option>
@@ -132,7 +214,7 @@ export const NewIssueModal: React.FC<NewIssueModalProps> = ({
               <select
                 value={issueArea}
                 onChange={(e) => setIssueArea(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-200 focus:outline-none focus:border-orange-500 cursor-pointer"
+                className="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-200 focus:outline-none focus:border-[#D71920] cursor-pointer"
               >
                 <option value="Email">Email Team</option>
                 <option value="SocMed">SocMed (Social Media / X / Meta)</option>
@@ -156,7 +238,7 @@ export const NewIssueModal: React.FC<NewIssueModalProps> = ({
                 value={reportedBy}
                 onChange={(e) => setReportedBy(e.target.value)}
                 placeholder="Staff full name"
-                className="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-200 focus:outline-none focus:border-orange-500"
+                className="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-200 focus:outline-none focus:border-[#D71920]"
               />
             </div>
 
@@ -167,7 +249,7 @@ export const NewIssueModal: React.FC<NewIssueModalProps> = ({
               <select
                 value={contactTeam}
                 onChange={(e) => setContactTeam(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-200 focus:outline-none focus:border-orange-500 cursor-pointer"
+                className="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-200 focus:outline-none focus:border-[#D71920] cursor-pointer"
               >
                 <option value="Harveet">Harveet (NOC Operations Lead)</option>
                 <option value="Nath">Nath (NOC Technical Lead)</option>
@@ -188,14 +270,14 @@ export const NewIssueModal: React.FC<NewIssueModalProps> = ({
               value={longDescription}
               onChange={(e) => setLongDescription(e.target.value)}
               placeholder="e.g. Unable to send/reply emails, delay in receiving incoming TM_X DMs, memory limit crash on report template..."
-              className="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-orange-500"
+              className="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-[#D71920]"
             />
           </div>
 
           {/* Live Guideline Matcher Assistant */}
           {matchingPlaybooks.length > 0 && (
-            <div className="bg-orange-500/[0.08] p-3 rounded-xl border border-orange-500/30">
-              <div className="flex items-center gap-1.5 text-xs font-semibold text-orange-400 mb-1">
+            <div className="bg-[#D71920]/[0.08] p-3 rounded-xl border border-[#D71920]/30">
+              <div className="flex items-center gap-1.5 text-xs font-semibold text-[#D71920] mb-1">
                 <Lightbulb className="w-3.5 h-3.5" />
                 <span>Recommended Historical Guideline Match</span>
               </div>
@@ -219,7 +301,7 @@ export const NewIssueModal: React.FC<NewIssueModalProps> = ({
                 value={expectedResult}
                 onChange={(e) => setExpectedResult(e.target.value)}
                 placeholder="e.g. Sub-minute message delivery"
-                className="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-200 focus:outline-none focus:border-orange-500"
+                className="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-200 focus:outline-none focus:border-[#D71920]"
               />
             </div>
 
@@ -232,7 +314,7 @@ export const NewIssueModal: React.FC<NewIssueModalProps> = ({
                 value={impact}
                 onChange={(e) => setImpact(e.target.value)}
                 placeholder="e.g. Email Team (45 agents impacted)"
-                className="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-200 focus:outline-none focus:border-orange-500"
+                className="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-200 focus:outline-none focus:border-[#D71920]"
               />
             </div>
           </div>
@@ -248,7 +330,7 @@ export const NewIssueModal: React.FC<NewIssueModalProps> = ({
                 value={evidenceLink}
                 onChange={(e) => setEvidenceLink(e.target.value)}
                 placeholder="e.g. Re_ Nubitel_Error.msg or Sharepoint URL"
-                className="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-200 focus:outline-none focus:border-orange-500"
+                className="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-200 focus:outline-none focus:border-[#D71920]"
               />
             </div>
 
@@ -259,7 +341,7 @@ export const NewIssueModal: React.FC<NewIssueModalProps> = ({
               <select
                 value={trackerLabel}
                 onChange={(e) => setTrackerLabel(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-200 focus:outline-none focus:border-orange-500 cursor-pointer"
+                className="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-200 focus:outline-none focus:border-[#D71920] cursor-pointer"
               >
                 <option value="System / Application level issue">System / Application level issue</option>
                 <option value="Vendor / DevOps issue">Vendor / DevOps issue</option>
@@ -281,7 +363,7 @@ export const NewIssueModal: React.FC<NewIssueModalProps> = ({
             </button>
             <button
               type="submit"
-              className="px-5 py-2 rounded-lg text-xs font-semibold text-white bg-orange-600 hover:bg-orange-500 transition-colors shadow-sm flex items-center gap-1.5 cursor-pointer"
+              className="px-5 py-2 rounded-lg text-xs font-bold text-white bg-[#D71920] hover:bg-[#BF151B] transition-colors shadow-sm shadow-[#D71920]/30 flex items-center gap-1.5 cursor-pointer"
             >
               <Plus className="w-4 h-4" />
               <span>Log Present Incident</span>

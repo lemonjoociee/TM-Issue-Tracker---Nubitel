@@ -172,7 +172,7 @@ export const SharePointSyncModal: React.FC<SharePointSyncModalProps> = ({
             onClick={() => setActiveTab('sync')}
             className={`px-3 py-2 text-xs font-medium border-b-2 transition-colors cursor-pointer ${
               activeTab === 'sync'
-                ? 'border-orange-500 text-white font-semibold'
+                ? 'border-[#D71920] text-white font-semibold'
                 : 'border-transparent text-slate-400 hover:text-slate-200'
             }`}
           >
@@ -182,7 +182,7 @@ export const SharePointSyncModal: React.FC<SharePointSyncModalProps> = ({
             onClick={() => setActiveTab('embed')}
             className={`px-3 py-2 text-xs font-medium border-b-2 transition-colors cursor-pointer ${
               activeTab === 'embed'
-                ? 'border-orange-500 text-white font-semibold'
+                ? 'border-[#D71920] text-white font-semibold'
                 : 'border-transparent text-slate-400 hover:text-slate-200'
             }`}
           >
@@ -192,7 +192,7 @@ export const SharePointSyncModal: React.FC<SharePointSyncModalProps> = ({
             onClick={() => setActiveTab('webhook')}
             className={`px-3 py-2 text-xs font-medium border-b-2 transition-colors cursor-pointer ${
               activeTab === 'webhook'
-                ? 'border-orange-500 text-white font-semibold'
+                ? 'border-[#D71920] text-white font-semibold'
                 : 'border-transparent text-slate-400 hover:text-slate-200'
             }`}
           >
@@ -220,7 +220,7 @@ export const SharePointSyncModal: React.FC<SharePointSyncModalProps> = ({
                   href={SHAREPOINT_CONFIG.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-xs font-semibold text-orange-400 hover:text-orange-300 flex items-center gap-1 transition-colors cursor-pointer"
+                  className="text-xs font-semibold text-[#D71920] hover:underline flex items-center gap-1 transition-colors cursor-pointer"
                 >
                   <span>Open in SharePoint Online</span>
                   <ExternalLink className="w-3.5 h-3.5" />
@@ -261,7 +261,7 @@ export const SharePointSyncModal: React.FC<SharePointSyncModalProps> = ({
                 onDragOver={handleDragOver}
                 onDrop={handleDrop}
                 onClick={() => fileInputRef.current?.click()}
-                className="border-2 border-dashed border-slate-700 hover:border-orange-500/70 bg-slate-950/40 hover:bg-slate-950/70 rounded-2xl p-6 text-center cursor-pointer transition-all group"
+                className="border-2 border-dashed border-slate-700 hover:border-[#D71920]/70 bg-slate-950/40 hover:bg-slate-950/70 rounded-2xl p-6 text-center cursor-pointer transition-all group"
               >
                 <input
                   type="file"
@@ -270,7 +270,7 @@ export const SharePointSyncModal: React.FC<SharePointSyncModalProps> = ({
                   accept=".xlsx,.xls,.csv"
                   className="hidden"
                 />
-                <div className="w-12 h-12 rounded-xl bg-orange-600/10 group-hover:bg-orange-600/20 text-orange-400 flex items-center justify-center mx-auto mb-3 transition-colors">
+                <div className="w-12 h-12 rounded-xl bg-[#D71920]/10 group-hover:bg-[#D71920]/20 text-[#D71920] flex items-center justify-center mx-auto mb-3 transition-colors">
                   <Upload className="w-6 h-6" />
                 </div>
                 <h4 className="text-sm font-semibold text-white mb-1">
@@ -329,7 +329,7 @@ export const SharePointSyncModal: React.FC<SharePointSyncModalProps> = ({
                   href={SHAREPOINT_CONFIG.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-orange-400 hover:underline flex items-center gap-1"
+                  className="text-[#D71920] hover:underline flex items-center gap-1 font-semibold"
                 >
                   <span>Open full screen in Excel Online</span>
                   <ExternalLink className="w-3 h-3" />
@@ -348,7 +348,7 @@ export const SharePointSyncModal: React.FC<SharePointSyncModalProps> = ({
                   href={SHAREPOINT_CONFIG.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-4 py-2 bg-orange-600 hover:bg-orange-500 text-white rounded-lg font-semibold text-xs transition-colors inline-flex items-center gap-2"
+                  className="px-4 py-2 bg-[#D71920] hover:bg-[#BF151B] text-white rounded-xl font-bold text-xs transition-colors inline-flex items-center gap-2 shadow-sm"
                 >
                   <span>Launch Live Excel in SharePoint</span>
                   <ExternalLink className="w-4 h-4" />
@@ -370,11 +370,11 @@ export const SharePointSyncModal: React.FC<SharePointSyncModalProps> = ({
 
               <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3 font-mono text-[11px]">
                 <div className="text-slate-400">
-                  <span className="text-orange-400 font-bold block mb-1">1. Trigger:</span>
+                  <span className="text-[#D71920] font-bold block mb-1">1. Trigger:</span>
                   SharePoint &rarr; "When a file is created or modified in a folder" (select folder containing <code className="text-white">Issue Tracker for TM NOC.xlsx</code>)
                 </div>
                 <div className="text-slate-400">
-                  <span className="text-orange-400 font-bold block mb-1">2. Action:</span>
+                  <span className="text-[#D71920] font-bold block mb-1">2. Action:</span>
                   HTTP POST to this applet's incoming sync webhook:
                 </div>
                 <div className="flex items-center justify-between p-2 rounded bg-slate-900 border border-slate-800 text-emerald-400 select-all">

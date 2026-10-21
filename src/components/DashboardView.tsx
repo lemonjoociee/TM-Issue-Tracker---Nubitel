@@ -186,7 +186,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             </button>
             <button
               onClick={onOpenNewIssue}
-              className="px-3 py-1.5 text-xs font-semibold text-white bg-orange-600 hover:bg-orange-500 rounded-lg transition-colors cursor-pointer"
+              className="px-3 py-1.5 text-xs font-bold text-white bg-[#D71920] hover:bg-[#BF151B] rounded-lg transition-colors cursor-pointer shadow-sm shadow-[#D71920]/30"
             >
               + Log Present Issue
             </button>
@@ -297,7 +297,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               onClick={() => onNavigateToGuidelines()}
               className="text-xs font-medium text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded-lg border border-slate-700 transition-colors flex items-center gap-1.5 cursor-pointer"
             >
-              <FileText className="w-3.5 h-3.5 text-orange-400" />
+              <FileText className="w-3.5 h-3.5 text-[#D71920]" />
               <span>Browse Knowledge Base</span>
             </button>
           </div>
@@ -329,7 +329,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                   onClick={() => onNavigateToTracker({ month: s.month })}
                   className="hover:bg-slate-800/40 transition-colors cursor-pointer group"
                 >
-                  <td className="py-3 px-4 font-sans font-semibold text-slate-200 group-hover:text-orange-400 flex items-center gap-2">
+                  <td className="py-3 px-4 font-sans font-semibold text-slate-200 group-hover:text-[#D71920] flex items-center gap-2">
                     <span>{s.month}</span>
                     <span className="text-[10px] text-slate-500 font-normal">2026</span>
                   </td>
@@ -406,7 +406,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                   {issues.filter((i) => i.rcaStatus === 'Pending RCA').length}
                 </td>
                 <td className="py-3.5 px-3 text-right text-slate-300 tabular-nums">99</td>
-                <td className="py-3.5 px-4 text-right text-orange-400 tabular-nums">72.8</td>
+                <td className="py-3.5 px-4 text-right text-[#D71920] font-bold tabular-nums">72.8</td>
               </tr>
             </tbody>
           </table>

@@ -1,8 +1,21 @@
 export type Priority = 'P1' | 'P2' | 'P3' | 'P4';
 
-export type IssueStatus = 'Resolved' | 'In Progress' | 'In Review' | 'On Hold' | 'Open';
+export type IssueStatus =
+  | 'Resolved'
+  | 'In Progress'
+  | 'In Review'
+  | 'On Hold'
+  | 'Open'
+  | 'Monitoring'
+  | 'Closed';
 
-export type RcaStatus = 'Included' | 'Pending RCA' | 'In Progress' | 'In Review' | 'Resolved' | 'N/A';
+export type RcaStatus =
+  | 'Included'
+  | 'Pending RCA'
+  | 'In Progress'
+  | 'In Review'
+  | 'Resolved'
+  | 'N/A';
 
 export type MonthName = 'July' | 'August' | 'September' | 'October';
 
@@ -15,7 +28,7 @@ export interface Issue {
   reportedBy: string;
   contactTeam: string; // NOC Lead/PIC e.g. "Harveet", "Nath", "Hargobind"
   priority: Priority;
-  issueArea: string; // "Email", "SocMed", "RTA Team", "FMC", etc.
+  issueArea: string; // "Email", "SocMed", "RTA Team", "FMC", "Voice", "SIP", etc.
   status: IssueStatus;
   longDescription: string;
   expectedResult: string;
@@ -30,6 +43,18 @@ export interface Issue {
   ageHours: string;
   month: MonthName;
   rcaStatus: RcaStatus;
+
+  // Standard NOC Incident Management fields
+  ticketId?: string; // e.g. INC-2026-00001 or NOC-20261019-001
+  customer?: string; // e.g. "Nubitel", "Telekom Malaysia", "CelcomDigi", "Maxis"
+  location?: string; // e.g. "KL", "Cyberjaya", "JB", "Menara TM"
+  service?: string; // "Voice", "SIP", "PRI", "Contact Center", "IVR", "SMS", "Network", etc.
+  callId?: string; // Incident ID, Ticket Number, Call ID, Reference Number
+  affectedUser?: string; // Affected user, team, or business unit
+  userEmail?: string; // Relevant user email
+  businessImpact?: string; // Operational impact
+  latestUpdate?: string; // Latest status update
+  category?: string; // "Service Incident", "Service Monitoring", "Service Recovery"
 }
 
 export interface MonthlySummary {

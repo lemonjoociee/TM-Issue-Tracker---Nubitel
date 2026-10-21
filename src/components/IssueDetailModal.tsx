@@ -53,7 +53,7 @@ export const IssueDetailModal: React.FC<IssueDetailModalProps> = ({
         {/* Header */}
         <div className="px-6 py-4 bg-slate-950/80 border-b border-slate-800 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <span className="font-mono text-base font-bold text-orange-400 tabular-nums">
+            <span className="font-mono text-base font-bold text-[#D71920] tabular-nums">
               Incident #{issue.id}
             </span>
             <span className="text-slate-500">·</span>
@@ -112,7 +112,7 @@ export const IssueDetailModal: React.FC<IssueDetailModalProps> = ({
                 value={formData.longDescription}
                 onChange={(e) => setFormData({ ...formData, longDescription: e.target.value })}
                 rows={2}
-                className="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-100 focus:outline-none focus:border-orange-500"
+                className="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-100 focus:outline-none focus:border-[#D71920]"
               />
             ) : (
               <div className="text-sm font-semibold text-white bg-slate-950/60 p-3 rounded-xl border border-slate-800">
@@ -246,7 +246,7 @@ export const IssueDetailModal: React.FC<IssueDetailModalProps> = ({
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-400">NOC PIC / Lead:</span>
-                  <span className="text-orange-400 font-semibold">{issue.contactTeam}</span>
+                  <span className="text-[#D71920] font-semibold">{issue.contactTeam}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-400">Tracker Label:</span>
@@ -321,7 +321,7 @@ export const IssueDetailModal: React.FC<IssueDetailModalProps> = ({
                 onChange={(e) => setFormData({ ...formData, rootCause: e.target.value })}
                 rows={3}
                 placeholder="Enter root cause analysis, architecture fault, or provider upstream delay..."
-                className="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-100 focus:outline-none focus:border-orange-500"
+                className="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-100 focus:outline-none focus:border-[#D71920]"
               />
             ) : (
               <div className="p-3.5 rounded-xl bg-amber-500/[0.04] border border-amber-500/20 text-slate-200 leading-relaxed font-normal">
@@ -342,7 +342,7 @@ export const IssueDetailModal: React.FC<IssueDetailModalProps> = ({
                 onChange={(e) => setFormData({ ...formData, resolution: e.target.value })}
                 rows={3}
                 placeholder="Describe how the issue was resolved or current update status..."
-                className="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-100 focus:outline-none focus:border-orange-500"
+                className="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-100 focus:outline-none focus:border-[#D71920]"
               />
             ) : (
               <div className="p-3.5 rounded-xl bg-emerald-500/[0.04] border border-emerald-500/20 text-slate-200 leading-relaxed font-normal">
@@ -362,7 +362,7 @@ export const IssueDetailModal: React.FC<IssueDetailModalProps> = ({
                 onChange={(e) => setFormData({ ...formData, actionTaken: e.target.value })}
                 rows={3}
                 placeholder="SOP steps taken, configuration changes, or preventive actions..."
-                className="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-100 focus:outline-none focus:border-orange-500"
+                className="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-100 focus:outline-none focus:border-[#D71920]"
               />
             ) : (
               <div className="p-3.5 rounded-xl bg-sky-500/[0.04] border border-sky-500/20 text-slate-200 leading-relaxed font-normal">
@@ -374,20 +374,20 @@ export const IssueDetailModal: React.FC<IssueDetailModalProps> = ({
           {/* Matching Operational Guidelines & Knowledge Playbooks */}
           {matchingGuidelines.length > 0 && (
             <div className="pt-2 border-t border-slate-800">
-              <span className="text-[11px] font-semibold text-orange-400 uppercase tracking-wider block mb-2 flex items-center gap-1.5">
+              <span className="text-[11px] font-semibold text-[#D71920] uppercase tracking-wider block mb-2 flex items-center gap-1.5">
                 <BookOpen className="w-3.5 h-3.5" />
-                <span>Related Operational Guidelines & Playbooks</span>
+                <span>Related Operational Guidelines &amp; Playbooks</span>
               </span>
 
               <div className="space-y-2">
                 {matchingGuidelines.map((g) => (
                   <div
                     key={g.id}
-                    className="p-3 rounded-lg bg-slate-950 border border-slate-800 hover:border-orange-500/40 transition-colors flex items-center justify-between"
+                    className="p-3 rounded-lg bg-slate-950 border border-slate-800 hover:border-[#D71920]/40 transition-colors flex items-center justify-between"
                   >
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="font-mono text-orange-400 font-bold text-[11px]">
+                        <span className="font-mono text-[#D71920] font-bold text-[11px]">
                           {g.id}
                         </span>
                         <span className="font-semibold text-slate-200">{g.title}</span>
@@ -403,7 +403,7 @@ export const IssueDetailModal: React.FC<IssueDetailModalProps> = ({
                           onClose();
                           onNavigateToGuideline(g.id);
                         }}
-                        className="text-xs text-orange-400 hover:text-orange-300 font-medium whitespace-nowrap ml-4 cursor-pointer"
+                        className="text-xs text-[#D71920] hover:underline font-semibold whitespace-nowrap ml-4 cursor-pointer"
                       >
                         Read SOP &rarr;
                       </button>

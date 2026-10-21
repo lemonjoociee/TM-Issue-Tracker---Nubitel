@@ -1,143 +1,243 @@
 import React from 'react';
-import { Plus, Download, RefreshCw } from 'lucide-react';
+import { TMLogo } from './TMLogo';
+import { UserSession } from './LoginPage';
+import { NavTab } from './Sidebar';
+import {
+  Plus,
+  Download,
+  RefreshCw,
+  Bell,
+  Sun,
+  Moon,
+  FileText,
+  FileSpreadsheet,
+  Layers,
+  Activity,
+  Server,
+  UserCheck,
+  ExternalLink,
+} from 'lucide-react';
 
 interface HeaderProps {
-  activeTab: 'dashboard' | 'tracker' | 'guidelines' | 'matrix';
-  setActiveTab: (tab: 'dashboard' | 'tracker' | 'guidelines' | 'matrix') => void;
+  activeTab: NavTab;
+  setActiveTab: (tab: NavTab) => void;
+  user?: UserSession;
   onOpenNewIssue: () => void;
   onExportCSV: () => void;
-  onImportCSV: () => void;
+  onExportExcel: () => void;
+  onOpenReportModal: () => void;
   onOpenSharePointSync: () => void;
   onRefreshSharePoint?: () => void;
   isLiveSyncing?: boolean;
-  onResetData: () => void;
   activeIssuesCount: number;
+  isDarkMode: boolean;
+  onToggleTheme: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
   activeTab,
   setActiveTab,
+  user,
   onOpenNewIssue,
   onExportCSV,
+  onExportExcel,
+  onOpenReportModal,
   onOpenSharePointSync,
   onRefreshSharePoint,
   isLiveSyncing = false,
   activeIssuesCount,
+  isDarkMode,
+  onToggleTheme,
 }) => {
   return (
-    <header className="sticky top-0 z-40 bg-slate-900/95 backdrop-blur-md border-b border-slate-800">
+    <header
+      className={`sticky top-0 z-40 border-b backdrop-blur-md transition-colors duration-200 ${
+        isDarkMode
+          ? 'bg-[#1e1e24]/95 border-neutral-800 text-neutral-100'
+          : 'bg-white/95 border-neutral-200 text-[#4A4A4A]'
+      }`}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between gap-8 h-16">
-          {/* Zone 1: Single text wordmark */}
+        <div className="flex items-center justify-between gap-4 h-16">
+          {/* Zone 1: Official TM Corporate Logo */}
           <div className="flex items-center gap-3 shrink-0">
-            <div className="w-8 h-8 rounded-lg bg-orange-600 flex items-center justify-center font-bold text-white shadow-sm">
-              TM
+            <TMLogo variant={isDarkMode ? 'white' : 'color'} size="md" />
+            <div className="hidden lg:block border-l border-neutral-300 dark:border-neutral-700 pl-3">
+              <div className="text-[10px] font-extrabold uppercase tracking-widest text-[#D71920] flex items-center gap-1.5">
+                <span>TM ONETRACK</span>
+                <span className="text-[9px] px-1.5 py-0.2 rounded bg-[#034DA1] text-white font-mono font-normal">Core v4.2</span>
+              </div>
+              <div className="text-xs font-bold text-[#4A4A4A] dark:text-neutral-200 leading-none mt-0.5">
+                NOC &amp; OPS Management Portal
+              </div>
             </div>
-            <a
-              href="#"
-              onClick={(e) => {
-                e.preventDefault();
-                setActiveTab('dashboard');
-              }}
-              className="text-base font-bold tracking-tight text-white hover:text-orange-400 transition-colors whitespace-nowrap"
-            >
-              NOC Issue Tracker
-            </a>
           </div>
 
-          {/* Zone 2: Concise single-line navigation links */}
-          <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-slate-300">
-            <button
-              onClick={() => setActiveTab('dashboard')}
-              className={`transition-colors whitespace-nowrap cursor-pointer pb-1 relative ${
-                activeTab === 'dashboard'
-                  ? 'text-white font-semibold after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-orange-500'
-                  : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              Ops Monitor
-            </button>
-            <button
-              onClick={() => setActiveTab('tracker')}
-              className={`transition-colors whitespace-nowrap cursor-pointer pb-1 relative flex items-center gap-2 ${
-                activeTab === 'tracker'
-                  ? 'text-white font-semibold after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-orange-500'
-                  : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              <span>Past & Present Issues</span>
-              {activeIssuesCount > 0 && (
-                <span className="font-mono text-xs px-1.5 py-0.2 bg-amber-500/20 text-amber-300 rounded border border-amber-500/30 tabular-nums">
-                  {activeIssuesCount} active
-                </span>
-              )}
-            </button>
-            <button
-              onClick={() => setActiveTab('guidelines')}
-              className={`transition-colors whitespace-nowrap cursor-pointer pb-1 relative ${
-                activeTab === 'guidelines'
-                  ? 'text-white font-semibold after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-orange-500'
-                  : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              RCA & Guidelines Hub
-            </button>
-            <button
-              onClick={() => setActiveTab('matrix')}
-              className={`transition-colors whitespace-nowrap cursor-pointer pb-1 relative ${
-                activeTab === 'matrix'
-                  ? 'text-white font-semibold after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-orange-500'
-                  : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              Monthly Summary Matrix
-            </button>
+          {/* Zone 2: Navigation Links (Role Filtered) */}
+          <nav className="hidden md:flex items-center gap-1 lg:gap-2 text-xs font-semibold">
+            {/* NOC Dashboard: Admin & NOC */}
+            {(user?.role === 'ADMIN' || user?.role === 'NOC_ENGINEER') && (
+              <button
+                onClick={() => setActiveTab('noc')}
+                className={`px-3 py-2 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
+                  activeTab === 'noc'
+                    ? 'bg-[#D71920] text-white shadow-sm'
+                    : isDarkMode
+                    ? 'text-neutral-300 hover:bg-neutral-800'
+                    : 'text-[#4A4A4A] hover:bg-[#F5F5F5]'
+                }`}
+              >
+                <Server className="w-3.5 h-3.5" />
+                <span>NOC</span>
+                {activeIssuesCount > 0 && (
+                  <span className={`px-1.5 py-0.2 text-[10px] rounded font-bold ${
+                    activeTab === 'noc' ? 'bg-white/20 text-white' : 'bg-[#D71920] text-white'
+                  }`}>
+                    {activeIssuesCount}
+                  </span>
+                )}
+              </button>
+            )}
+
+            {/* OPS Dashboard: Admin & OPS */}
+            {(user?.role === 'ADMIN' || user?.role === 'OPS_EXECUTIVE') && (
+              <button
+                onClick={() => setActiveTab('ops')}
+                className={`px-3 py-2 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
+                  activeTab === 'ops'
+                    ? 'bg-[#D71920] text-white shadow-sm'
+                    : isDarkMode
+                    ? 'text-neutral-300 hover:bg-neutral-800'
+                    : 'text-[#4A4A4A] hover:bg-[#F5F5F5]'
+                }`}
+              >
+                <Activity className="w-3.5 h-3.5" />
+                <span>OPS Dashboard</span>
+              </button>
+            )}
+
+            {/* Admin Dashboard: Admin only */}
+            {user?.role === 'ADMIN' && (
+              <button
+                onClick={() => setActiveTab('admin')}
+                className={`px-3 py-2 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
+                  activeTab === 'admin'
+                    ? 'bg-[#D71920] text-white shadow-sm'
+                    : isDarkMode
+                    ? 'text-neutral-300 hover:bg-neutral-800'
+                    : 'text-[#4A4A4A] hover:bg-[#F5F5F5]'
+                }`}
+              >
+                <UserCheck className="w-3.5 h-3.5" />
+                <span>Admin</span>
+              </button>
+            )}
+
+            {/* Technical Tools: Admin & NOC */}
+            {user?.role !== 'OPS_EXECUTIVE' && (
+              <>
+                <button
+                  onClick={() => setActiveTab('tracker')}
+                  className={`px-3 py-2 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
+                    activeTab === 'tracker'
+                      ? 'bg-[#D71920] text-white shadow-sm'
+                      : isDarkMode
+                      ? 'text-neutral-300 hover:bg-neutral-800'
+                      : 'text-[#4A4A4A] hover:bg-[#F5F5F5]'
+                  }`}
+                >
+                  <Layers className="w-3.5 h-3.5" />
+                  <span>Tracker</span>
+                </button>
+
+                <button
+                  onClick={() => setActiveTab('guidelines')}
+                  className={`px-3 py-2 rounded-lg transition-all cursor-pointer ${
+                    activeTab === 'guidelines'
+                      ? 'bg-[#D71920] text-white shadow-sm'
+                      : isDarkMode
+                      ? 'text-neutral-300 hover:bg-neutral-800'
+                      : 'text-[#4A4A4A] hover:bg-[#F5F5F5]'
+                  }`}
+                >
+                  Guidelines &amp; RCA
+                </button>
+
+                <button
+                  onClick={() => setActiveTab('matrix')}
+                  className={`px-3 py-2 rounded-lg transition-all cursor-pointer ${
+                    activeTab === 'matrix'
+                      ? 'bg-[#D71920] text-white shadow-sm'
+                      : isDarkMode
+                      ? 'text-neutral-300 hover:bg-neutral-800'
+                      : 'text-[#4A4A4A] hover:bg-[#F5F5F5]'
+                  }`}
+                >
+                  Matrix
+                </button>
+              </>
+            )}
           </nav>
 
-          {/* Zone 3: Primary action & utilities */}
-          <div className="flex items-center gap-2.5 shrink-0">
-            {/* Refresh SharePoint Button with active sync spinner */}
+          {/* Zone 3: TM Actions & Utilities */}
+          <div className="flex items-center gap-2 shrink-0">
+            {/* Real-time SharePoint Button */}
             <button
               onClick={onRefreshSharePoint || onOpenSharePointSync}
               disabled={isLiveSyncing}
-              title="Real-time sync with Scicom SharePoint (Click to refresh immediately)"
-              className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border transition-all whitespace-nowrap shadow-sm ${
+              title="SharePoint Live Synchronizer (Click to pull fresh changes)"
+              className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border transition-all whitespace-nowrap shadow-sm cursor-pointer ${
                 isLiveSyncing
-                  ? 'text-emerald-200 bg-emerald-950/80 border-emerald-500/60 cursor-wait opacity-90'
-                  : 'text-emerald-300 bg-emerald-950/60 hover:bg-emerald-900/70 border-emerald-500/40 cursor-pointer'
+                  ? 'text-emerald-300 bg-emerald-950/80 border-emerald-500/50 cursor-wait'
+                  : isDarkMode
+                  ? 'text-emerald-400 bg-emerald-950/40 hover:bg-emerald-900/50 border-emerald-500/40'
+                  : 'text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border-emerald-300'
               }`}
             >
               {isLiveSyncing ? (
-                <RefreshCw className="w-3.5 h-3.5 animate-spin text-emerald-300 shrink-0" />
+                <RefreshCw className="w-3.5 h-3.5 animate-spin text-emerald-400 shrink-0" />
               ) : (
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
               )}
-              <span>{isLiveSyncing ? 'Syncing...' : 'SharePoint Live'}</span>
+              <span className="hidden sm:inline">
+                {isLiveSyncing ? 'Syncing...' : 'SharePoint Live'}
+              </span>
             </button>
 
+            {/* Generate TM Report button */}
             <button
-              onClick={onOpenSharePointSync}
-              title="Configure SharePoint Sync settings & view link"
-              className="hidden lg:flex items-center gap-1 px-2 py-1.5 text-xs text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-lg transition-colors cursor-pointer"
+              onClick={onOpenReportModal}
+              title="Export Official TM Report (PDF / Print layout)"
+              className={`hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border transition-colors cursor-pointer ${
+                isDarkMode
+                  ? 'bg-neutral-800 hover:bg-neutral-700 border-neutral-700 text-neutral-200'
+                  : 'bg-[#F5F5F5] hover:bg-neutral-200 border-neutral-300 text-[#4A4A4A]'
+              }`}
             >
-              <span>Settings</span>
+              <FileText className="w-3.5 h-3.5 text-[#D71920]" />
+              <span>TM Report</span>
             </button>
 
-            <button
-              onClick={onExportCSV}
-              title="Export Tracker as CSV formatted sheet"
-              className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-300 bg-slate-800/80 hover:bg-slate-700 rounded-lg border border-slate-700 transition-colors whitespace-nowrap cursor-pointer"
-            >
-              <Download className="w-3.5 h-3.5" />
-              <span>Export</span>
-            </button>
-
+            {/* Log Incident Button in TM Corporate Red */}
             <button
               onClick={onOpenNewIssue}
-              className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold text-white bg-orange-600 hover:bg-orange-500 rounded-lg shadow-sm transition-colors whitespace-nowrap cursor-pointer"
+              className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold text-white bg-[#D71920] hover:bg-[#BF151B] active:bg-[#A31015] rounded-lg shadow-sm shadow-[#D71920]/30 transition-all whitespace-nowrap cursor-pointer"
             >
               <Plus className="w-4 h-4" />
               <span>Log Incident</span>
+            </button>
+
+            {/* Theme Toggle Button */}
+            <button
+              onClick={onToggleTheme}
+              className={`p-2 rounded-lg border transition-colors cursor-pointer ${
+                isDarkMode
+                  ? 'bg-neutral-800 border-neutral-700 text-amber-400 hover:bg-neutral-700'
+                  : 'bg-neutral-100 border-neutral-200 text-slate-700 hover:bg-neutral-200'
+              }`}
+              title="Toggle Light / Dark mode"
+            >
+              {isDarkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             </button>
           </div>
         </div>

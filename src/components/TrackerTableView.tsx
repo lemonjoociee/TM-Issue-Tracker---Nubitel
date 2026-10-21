@@ -226,7 +226,7 @@ export const TrackerTableView: React.FC<TrackerTableViewProps> = ({
                 setSearchQuery(e.target.value);
                 setCurrentPage(1);
               }}
-              className="w-full bg-slate-950 border border-slate-800 rounded-lg pl-9 pr-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
+              className="w-full bg-slate-950 border border-slate-800 rounded-lg pl-9 pr-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-[#D71920] focus:ring-1 focus:ring-[#D71920]"
             />
           </div>
 
@@ -238,7 +238,7 @@ export const TrackerTableView: React.FC<TrackerTableViewProps> = ({
                 setSelectedMonth(e.target.value);
                 setCurrentPage(1);
               }}
-              className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-300 focus:outline-none focus:border-orange-500 cursor-pointer"
+              className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-300 focus:outline-none focus:border-[#D71920] cursor-pointer"
             >
               <option value="all">All Months</option>
               <option value="July">July 2026 (18)</option>
@@ -256,7 +256,7 @@ export const TrackerTableView: React.FC<TrackerTableViewProps> = ({
                 setSelectedPriority(e.target.value);
                 setCurrentPage(1);
               }}
-              className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-300 focus:outline-none focus:border-orange-500 cursor-pointer"
+              className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-300 focus:outline-none focus:border-[#D71920] cursor-pointer"
             >
               <option value="all">All Priorities</option>
               <option value="P1">P1 Critical</option>
@@ -274,7 +274,7 @@ export const TrackerTableView: React.FC<TrackerTableViewProps> = ({
                 setSelectedArea(e.target.value);
                 setCurrentPage(1);
               }}
-              className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-300 focus:outline-none focus:border-orange-500 cursor-pointer"
+              className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-300 focus:outline-none focus:border-[#D71920] cursor-pointer"
             >
               <option value="all">All Issue Areas</option>
               <option value="Email">Email Team</option>
@@ -294,7 +294,7 @@ export const TrackerTableView: React.FC<TrackerTableViewProps> = ({
                 setSelectedRcaStatus(e.target.value);
                 setCurrentPage(1);
               }}
-              className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-300 focus:outline-none focus:border-orange-500 cursor-pointer"
+              className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-300 focus:outline-none focus:border-[#D71920] cursor-pointer"
             >
               <option value="all">All RCA Statuses</option>
               <option value="Included">RCA Included</option>
@@ -320,7 +320,7 @@ export const TrackerTableView: React.FC<TrackerTableViewProps> = ({
               viewSegment !== 'all') && (
               <button
                 onClick={clearAllFilters}
-                className="text-orange-400 hover:text-orange-300 flex items-center gap-1 font-medium cursor-pointer ml-2"
+                className="text-[#D71920] hover:text-[#BF151B] flex items-center gap-1 font-semibold cursor-pointer ml-2"
               >
                 <X className="w-3.5 h-3.5" />
                 <span>Reset filters</span>
@@ -442,7 +442,7 @@ export const TrackerTableView: React.FC<TrackerTableViewProps> = ({
                     <p className="text-sm font-medium">No incidents matched your search filters.</p>
                     <button
                       onClick={clearAllFilters}
-                      className="mt-2 text-xs text-orange-400 hover:text-orange-300 underline cursor-pointer"
+                      className="mt-2 text-xs text-[#D71920] hover:underline cursor-pointer"
                     >
                       Clear active filters
                     </button>
@@ -460,7 +460,7 @@ export const TrackerTableView: React.FC<TrackerTableViewProps> = ({
                       }`}
                     >
                       {/* ID */}
-                      <td className="py-2.5 px-3 font-mono font-semibold text-slate-300 group-hover:text-orange-400 tabular-nums">
+                      <td className="py-2.5 px-3 font-mono font-semibold text-slate-300 group-hover:text-[#D71920] tabular-nums">
                         #{issue.id}
                       </td>
 
