@@ -5,7 +5,6 @@ import {
   LayoutDashboard,
   PlusCircle,
   ListOrdered,
-  UserCheck,
   AlertOctagon,
   BarChart3,
   Settings,
@@ -24,7 +23,6 @@ export type NOCTab =
   | 'ops'
   | 'create'
   | 'list'
-  | 'my-assigned'
   | 'overdue'
   | 'reports'
   | 'admin';
@@ -34,7 +32,6 @@ interface NOCSidebarProps {
   setActiveTab: (tab: NOCTab) => void;
   user: UserSession;
   totalIncidentsCount: number;
-  myAssignedCount: number;
   overdueCount: number;
   onOpenCreateModal: () => void;
   onOpenSharePointModal: () => void;
@@ -49,7 +46,6 @@ export const NOCSidebar: React.FC<NOCSidebarProps> = ({
   setActiveTab,
   user,
   totalIncidentsCount,
-  myAssignedCount,
   overdueCount,
   onOpenCreateModal,
   onOpenSharePointModal,
@@ -89,13 +85,6 @@ export const NOCSidebar: React.FC<NOCSidebarProps> = ({
       label: 'Incident List',
       icon: ListOrdered,
       badge: totalIncidentsCount.toString(),
-      hideForOps: true,
-    },
-    {
-      id: 'my-assigned' as NOCTab,
-      label: 'My Assigned Incidents',
-      icon: UserCheck,
-      badge: myAssignedCount.toString(),
       hideForOps: true,
     },
     {

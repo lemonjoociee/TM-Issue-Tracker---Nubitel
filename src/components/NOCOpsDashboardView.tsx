@@ -817,9 +817,9 @@ export const NOCOpsDashboardView: React.FC<NOCOpsDashboardViewProps> = ({
                   </span>
                 </div>
                 <div>
-                  <span className="text-slate-700 dark:text-slate-400 block text-[11px] font-bold">Assigned Engineer</span>
-                  <span className="font-extrabold text-slate-950 dark:text-neutral-200 text-xs mt-0.5 block">
-                    {selectedIncidentForModal.assignedPerson}
+                  <span className="text-slate-700 dark:text-slate-400 block text-[11px] font-bold">Assignment</span>
+                  <span className="font-extrabold text-[#034DA1] dark:text-blue-400 text-xs mt-0.5 block">
+                    All NOC (Collaborative)
                   </span>
                 </div>
               </div>

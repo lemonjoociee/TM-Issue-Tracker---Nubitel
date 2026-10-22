@@ -97,16 +97,21 @@ export default function App() {
 
   // Incidents Database (Table 1 in SharePoint)
   const [incidents, setIncidents] = useState<Incident[]>(() => {
+    let list = INITIAL_NOC_INCIDENTS;
     try {
       const saved = localStorage.getItem(STORAGE_INCIDENTS);
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        if (Array.isArray(parsed) && parsed.length > 0) list = parsed;
       }
     } catch {
       // fallback
     }
-    return INITIAL_NOC_INCIDENTS;
+    return list.map((inc) => ({
+      ...inc,
+      assignedPerson: 'All NOC',
+      assignedTeam: 'NOC',
+    }));
   });
 
   // Incident Histories (Table 2 in SharePoint)
@@ -284,16 +289,6 @@ export default function App() {
   const overdueCount = useMemo(() => {
     return incidents.filter((i) => isIncidentOverdue(i)).length;
   }, [incidents]);
-
-  const myAssignedCount = useMemo(() => {
-    if (!currentUser) return 0;
-    const nameKey = currentUser.name.toLowerCase().split(' ')[0];
-    return incidents.filter(
-      (i) =>
-        i.assignedPerson.toLowerCase().includes(nameKey) ||
-        i.assignedPersonEmail.toLowerCase() === currentUser.email.toLowerCase()
-    ).length;
-  }, [incidents, currentUser]);
 
   // 1. Authentication Handlers
   const handleLogin = (session: UserSession, remember: boolean) => {
@@ -738,7 +733,6 @@ export default function App() {
         }}
         user={currentUser}
         totalIncidentsCount={incidents.filter((i) => !i.isArchived).length}
-        myAssignedCount={myAssignedCount}
         overdueCount={overdueCount}
         onOpenCreateModal={() => setActiveTab('create')}
         onOpenSharePointModal={() => setIsSharePointModalOpen(true)}
@@ -816,27 +810,7 @@ export default function App() {
             />
           )}
 
-          {/* TAB 4: My Assigned Incidents */}
-          {activeTab === 'my-assigned' && (
-            <NOCIncidentListView
-              incidents={incidents}
-              currentUser={currentUser}
-              onSelectIncident={(inc, tab) => {
-                setSelectedIncident(inc);
-                setInitialDetailTab(tab || 'overview');
-              }}
-              onOpenCreateModal={() => setActiveTab('create')}
-              onOpenResolveModal={(inc) => setResolvingIncident(inc)}
-              onOpenReminderModal={(inc) => setRemindingIncident(inc)}
-              onChangeStatusQuick={(inc, newStatus) =>
-                handleChangeStatus(inc.incidentId, newStatus, 'Quick status change via list')
-              }
-              initialFilter={{ assignedToMe: true }}
-              isDarkMode={isDarkMode}
-            />
-          )}
-
-          {/* TAB 5: Overdue Incidents */}
+          {/* TAB 4: Overdue Incidents */}
           {activeTab === 'overdue' && (
             <NOCIncidentListView
               incidents={incidents}

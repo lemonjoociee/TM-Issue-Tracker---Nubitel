@@ -30,6 +30,7 @@ import {
   Layers,
   Phone,
   RotateCcw,
+  Users,
 } from 'lucide-react';
 
 interface NOCIncidentDetailModalProps {
@@ -83,11 +84,6 @@ export const NOCIncidentDetailModal: React.FC<NOCIncidentDetailModalProps> = ({
   const [targetStatus, setTargetStatus] = useState<IncidentStatus>(incident.status);
   const [statusRemarks, setStatusRemarks] = useState('');
 
-  const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
-  const [targetPerson, setTargetPerson] = useState(incident.assignedPerson);
-  const [targetTeam, setTargetTeam] = useState(incident.assignedTeam);
-  const [assignRemarks, setAssignRemarks] = useState('');
-
   const [isReopenModalOpen, setIsReopenModalOpen] = useState(false);
   const [reopenRemarks, setReopenRemarks] = useState('');
 
@@ -121,18 +117,6 @@ export const NOCIncidentDetailModal: React.FC<NOCIncidentDetailModalProps> = ({
     onChangeStatus(incident.incidentId, targetStatus, statusRemarks.trim() || `Status updated to ${targetStatus}`);
     setIsStatusModalOpen(false);
     setStatusRemarks('');
-  };
-
-  const handleSaveAssignment = (e: React.FormEvent) => {
-    e.preventDefault();
-    onChangeAssignment(
-      incident.incidentId,
-      targetPerson.trim(),
-      targetTeam.trim(),
-      assignRemarks.trim() || `Reassigned to ${targetPerson} (${targetTeam})`
-    );
-    setIsAssignModalOpen(false);
-    setAssignRemarks('');
   };
 
   const handleSaveReopen = (e: React.FormEvent) => {
@@ -285,11 +269,12 @@ export const NOCIncidentDetailModal: React.FC<NOCIncidentDetailModalProps> = ({
                 </div>
 
                 <div className={`p-3 rounded-xl border ${subCardBg}`}>
-                  <div className="text-[10px] font-bold uppercase text-slate-400">Assigned Lead</div>
-                  <div className="text-xs font-bold mt-0.5 text-slate-800 dark:text-neutral-200 truncate">
-                    {incident.assignedPerson}
+                  <div className="text-[10px] font-bold uppercase text-slate-400">Assigned Team</div>
+                  <div className="text-xs font-bold mt-0.5 text-[#034DA1] dark:text-blue-400 truncate flex items-center gap-1.5">
+                    <Users className="w-3.5 h-3.5" />
+                    <span>All NOC</span>
                   </div>
-                  <div className="text-[10px] text-slate-400 truncate">{incident.assignedTeam}</div>
+                  <div className="text-[10px] text-slate-400 truncate">Everyone helps this issue</div>
                 </div>
 
                 <div className={`p-3 rounded-xl border ${subCardBg}`}>
@@ -687,17 +672,6 @@ export const NOCIncidentDetailModal: React.FC<NOCIncidentDetailModalProps> = ({
               <span>Add Progress Update</span>
             </button>
 
-            {/* Change Assignment */}
-            <button
-              onClick={() => setIsAssignModalOpen(true)}
-              className={`px-3 py-2 rounded-xl border text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-colors ${
-                isDarkMode ? 'border-neutral-700 text-neutral-200 hover:bg-neutral-800' : 'border-slate-300 text-slate-700 hover:bg-white'
-              }`}
-            >
-              <UserCheck className="w-3.5 h-3.5" />
-              <span>Change Assignment</span>
-            </button>
-
             {/* Change Status */}
             <button
               onClick={() => setIsStatusModalOpen(true)}
@@ -867,77 +841,6 @@ export const NOCIncidentDetailModal: React.FC<NOCIncidentDetailModalProps> = ({
                   className="px-4 py-2 rounded-xl bg-[#034DA1] text-white text-xs font-bold cursor-pointer"
                 >
                   Apply Status Change
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* Sub-Modal: Change Assignment */}
-      {isAssignModalOpen && (
-        <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
-          <div className={`w-full max-w-md rounded-2xl border p-6 shadow-2xl ${cardBg}`}>
-            <h3 className="text-sm font-bold text-slate-900 dark:text-white uppercase mb-3">
-              Change Assigned Team &amp; Person
-            </h3>
-            <form onSubmit={handleSaveAssignment} className="space-y-3 text-xs">
-              <div>
-                <label className="block text-xs font-bold text-slate-700 dark:text-neutral-300 mb-1">
-                  Assigned Team
-                </label>
-                <select
-                  value={targetTeam}
-                  onChange={(e) => setTargetTeam(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-xs"
-                >
-                  <option value="Tier 2 NOC Operations">Tier 2 NOC Operations</option>
-                  <option value="Tier 1 Support">Tier 1 Support</option>
-                  <option value="Tier 3 Voice Core">Tier 3 Voice Core</option>
-                  <option value="Network & Infrastructure Team">Network &amp; Infrastructure Team</option>
-                  <option value="Vendor Escalation Team">Vendor Escalation Team</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-slate-700 dark:text-neutral-300 mb-1">
-                  Assigned NOC Person
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={targetPerson}
-                  onChange={(e) => setTargetPerson(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-xs"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-slate-700 dark:text-neutral-300 mb-1">
-                  Reason for Reassignment
-                </label>
-                <input
-                  type="text"
-                  value={assignRemarks}
-                  onChange={(e) => setAssignRemarks(e.target.value)}
-                  placeholder="e.g. Shift handover or specialization escalation..."
-                  className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-xs"
-                />
-              </div>
-
-              <div className="flex justify-end gap-2 pt-3 border-t border-slate-200 dark:border-neutral-800">
-                <button
-                  type="button"
-                  onClick={() => setIsAssignModalOpen(false)}
-                  className="px-3 py-1.5 text-xs text-slate-500 cursor-pointer"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 rounded-xl bg-[#034DA1] text-white text-xs font-bold cursor-pointer"
-                >
-                  Update Assignment
                 </button>
               </div>
             </form>

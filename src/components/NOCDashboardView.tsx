@@ -78,9 +78,9 @@ export const NOCDashboardView: React.FC<NOCDashboardViewProps> = ({
 
   const assignedToMe = useMemo(() => {
     return incidents
-      .filter((i) => i.assignedPerson.toLowerCase().includes(user.name.toLowerCase().split(' ')[0]) || i.assignedPersonEmail === user.email)
+      .filter((i) => i.status !== 'Resolved' && i.status !== 'Closed')
       .slice(0, 5);
-  }, [incidents, user]);
+  }, [incidents]);
 
   const recentlyResolved = useMemo(() => {
     return incidents
@@ -442,7 +442,7 @@ export const NOCDashboardView: React.FC<NOCDashboardViewProps> = ({
                       {inc.issueTitle}
                     </div>
                     <div className="text-[11px] text-slate-500 dark:text-neutral-400 mt-0.5 truncate">
-                      {inc.customerName} &bull; {inc.siteLocation} &bull; Assigned: {inc.assignedPerson}
+                      {inc.customerName} &bull; {inc.siteLocation} &bull; Assigned: All NOC
                     </div>
                   </div>
                   <div className="text-right shrink-0">
@@ -513,27 +513,32 @@ export const NOCDashboardView: React.FC<NOCDashboardViewProps> = ({
           </div>
         </div>
 
-        {/* Section: Incidents Assigned to Current User */}
+        {/* Section: Collaborative NOC Incidents Queue */}
         <div className={`p-5 rounded-2xl border ${cardBg}`}>
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <Activity className="w-4 h-4 text-[#034DA1]" />
-              <h2 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-tight">
-                Assigned to You ({user.name})
-              </h2>
+              <div>
+                <h2 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-tight">
+                  Active NOC Incident Queue (Collaborative)
+                </h2>
+                <p className="text-[10px] text-slate-500 dark:text-neutral-400">
+                  Shared queue &bull; Everyone in NOC collaborates to resolve
+                </p>
+              </div>
             </div>
             <button
-              onClick={() => onNavigateToList({ assignedToMe: true })}
+              onClick={() => onNavigateToList({})}
               className="text-xs text-[#034DA1] dark:text-blue-400 font-bold hover:underline flex items-center gap-1 cursor-pointer"
             >
-              <span>View My Queue</span>
+              <span>View All</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
 
           <div className="space-y-2.5">
             {assignedToMe.length === 0 ? (
-              <div className="text-center py-6 text-xs text-slate-400">No active incidents assigned to your profile</div>
+              <div className="text-center py-6 text-xs text-slate-400">No open incidents in the collaborative queue</div>
             ) : (
               assignedToMe.map((inc) => (
                 <div
@@ -557,7 +562,7 @@ export const NOCDashboardView: React.FC<NOCDashboardViewProps> = ({
                       {inc.issueTitle}
                     </div>
                     <div className="text-[11px] text-slate-500 dark:text-neutral-400 mt-0.5 truncate">
-                      Next Follow-up: {inc.nextFollowUpDateTime} &bull; Team: {inc.assignedTeam}
+                      Next Follow-up: {inc.nextFollowUpDateTime} &bull; Assigned: All NOC
                     </div>
                   </div>
                   <div className="text-right shrink-0">

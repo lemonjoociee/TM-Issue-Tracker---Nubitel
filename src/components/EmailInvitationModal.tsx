@@ -274,6 +274,12 @@ export const EmailInvitationModal: React.FC<EmailInvitationModalProps> = ({
                   </span>
                 </div>
                 <div className="flex justify-between items-center text-slate-600 dark:text-neutral-400">
+                  <span>System Sender:</span>
+                  <span className="font-mono text-slate-900 dark:text-white font-semibold">
+                    izzuldiniee@gmail.com
+                  </span>
+                </div>
+                <div className="flex justify-between items-center text-slate-600 dark:text-neutral-400">
                   <span>Recipient:</span>
                   <span className="font-bold text-slate-900 dark:text-white">
                     {recipientName} &lt;{recipientEmail}&gt;
@@ -547,7 +553,7 @@ export const EmailInvitationModal: React.FC<EmailInvitationModalProps> = ({
                     className="w-4 h-4 text-[#D71920] rounded border-slate-300 dark:border-neutral-700 cursor-pointer"
                   />
                   <label htmlFor="ccAdmin" className="text-xs text-slate-700 dark:text-neutral-300 cursor-pointer">
-                    Send dispatch copy &amp; audit receipt to <strong>noc.admin@tm.com.my</strong>
+                    Send dispatch copy &amp; audit receipt to <strong>izzuldiniee@gmail.com</strong>
                   </label>
                 </div>
 
@@ -613,7 +619,7 @@ export const EmailInvitationModal: React.FC<EmailInvitationModalProps> = ({
                       {/* Meta header */}
                       <div className="border-b border-slate-100 pb-2.5 text-[11px] text-slate-500 space-y-0.5">
                         <div>
-                          <strong>From:</strong> Telekom Malaysia NOC System &lt;noc.admin@tm.com.my&gt;
+                          <strong>From:</strong> Telekom Malaysia NOC System &lt;izzuldiniee@gmail.com&gt;
                         </div>
                         <div>
                           <strong>To:</strong>{' '}

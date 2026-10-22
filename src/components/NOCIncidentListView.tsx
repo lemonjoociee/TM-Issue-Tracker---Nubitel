@@ -366,35 +366,11 @@ export const NOCIncidentListView: React.FC<NOCIncidentListViewProps> = ({
           </div>
 
           <div>
-            <label className="block text-[10px] font-bold uppercase text-slate-400 mb-1">Assigned Team</label>
-            <select
-              value={teamFilter}
-              onChange={(e) => setTeamFilter(e.target.value)}
-              className={`${inputClass} w-full`}
-            >
-              <option value="all">All Teams</option>
-              {teams.map((t) => (
-                <option key={t} value={t}>
-                  {t}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-[10px] font-bold uppercase text-slate-400 mb-1">Assigned Person</label>
-            <select
-              value={personFilter}
-              onChange={(e) => setPersonFilter(e.target.value)}
-              className={`${inputClass} w-full`}
-            >
-              <option value="all">All Personnel</option>
-              {persons.map((p) => (
-                <option key={p} value={p}>
-                  {p}
-                </option>
-              ))}
-            </select>
+            <label className="block text-[10px] font-bold uppercase text-slate-400 mb-1">Assignment</label>
+            <div className={`${inputClass} w-full flex items-center justify-between text-slate-700 dark:text-neutral-300`}>
+              <span className="font-bold text-[#034DA1] dark:text-blue-400">All NOC</span>
+              <span className="text-[10px] text-slate-400">Collaborative</span>
+            </div>
           </div>
 
           <div>
@@ -437,8 +413,7 @@ export const NOCIncidentListView: React.FC<NOCIncidentListViewProps> = ({
                 <th className="py-3 px-3">Service / System</th>
                 <th className="py-3 px-3 min-w-[200px]">Issue Title</th>
                 <th className="py-3 px-3">Priority</th>
-                <th className="py-3 px-3">Assigned Team</th>
-                <th className="py-3 px-3">Assigned Person</th>
+                <th className="py-3 px-3">Assignment</th>
                 <th className="py-3 px-3">Status</th>
                 <th className="py-3 px-3">Last Updated</th>
                 <th className="py-3 px-3">Next Follow-up</th>
@@ -450,7 +425,7 @@ export const NOCIncidentListView: React.FC<NOCIncidentListViewProps> = ({
             <tbody className="divide-y divide-slate-100 dark:divide-neutral-800">
               {filteredIncidents.length === 0 ? (
                 <tr>
-                  <td colSpan={16} className="py-12 text-center text-slate-400">
+                  <td colSpan={15} className="py-12 text-center text-slate-400">
                     No matching incidents found. Adjust filters or register a new incident.
                   </td>
                 </tr>
@@ -518,14 +493,11 @@ export const NOCIncidentListView: React.FC<NOCIncidentListViewProps> = ({
                         {renderPriorityBadge(inc.priority)}
                       </td>
 
-                      {/* 9. Assigned Team */}
-                      <td className="py-3 px-3 text-slate-600 dark:text-neutral-400 whitespace-nowrap text-[11px]">
-                        {inc.assignedTeam}
-                      </td>
-
-                      {/* 10. Assigned Person */}
-                      <td className="py-3 px-3 font-bold text-slate-800 dark:text-neutral-200 whitespace-nowrap text-[11px]">
-                        {inc.assignedPerson}
+                      {/* 9. Assignment */}
+                      <td className="py-3 px-3 whitespace-nowrap text-[11px]">
+                        <span className="inline-flex items-center gap-1 font-bold text-[#034DA1] dark:text-blue-400 bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-900/50 px-2 py-0.5 rounded">
+                          All NOC
+                        </span>
                       </td>
 
                       {/* 11. Status */}

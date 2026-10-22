@@ -62,8 +62,8 @@ export const NOCAdminPageView: React.FC<NOCAdminPageViewProps> = ({
 
   const [formConfig, setFormConfig] = useState<AdminSystemConfig>(() => {
     const sanitizedUsers = (config.authorizedUsers || []).map((u) => {
-      if (u.role === 'NOC_USER' || u.team?.includes('Tier 2') || u.team?.includes('NOC Operations')) {
-        return { ...u, team: 'NOC' };
+      if (u.role === 'NOC_USER' || u.team?.includes('Tier') || u.team?.includes('NOC Operations')) {
+        return { ...u, department: 'NOC', team: 'NOC' };
       }
       return u;
     });
@@ -128,13 +128,21 @@ export const NOCAdminPageView: React.FC<NOCAdminPageViewProps> = ({
   };
 
   const handleSetUserRole = (userId: string, newRole: UserRole) => {
-    const updatedUsers = formConfig.authorizedUsers.map((u) =>
-      u.id === userId ? { ...u, role: newRole } : u
-    );
+    const updatedUsers = formConfig.authorizedUsers.map((u) => {
+      if (u.id === userId) {
+        return {
+          ...u,
+          role: newRole,
+          department: newRole === 'NOC_USER' ? 'NOC' : u.department,
+          team: newRole === 'NOC_USER' ? 'NOC' : u.team,
+        };
+      }
+      return u;
+    });
     const updated = { ...formConfig, authorizedUsers: updatedUsers };
     setFormConfig(updated);
     onUpdateConfig(updated);
-    setInviteNotification(`Updated role for user to ${newRole}`);
+    setInviteNotification(`Updated role for user to ${newRole === 'NOC_USER' ? 'NOC' : newRole}`);
     setTimeout(() => setInviteNotification(null), 3000);
   };
 
@@ -464,7 +472,7 @@ export const NOCAdminPageView: React.FC<NOCAdminPageViewProps> = ({
                         </div>
                         <div className="text-xs text-slate-700 dark:text-neutral-400 font-medium">
                           <strong className="text-slate-900 dark:text-neutral-300">{u.email}</strong> &bull;{' '}
-                          {u.department} ({formatUserTeam(u.team, u.role)})
+                          {u.role === 'NOC_USER' ? 'NOC' : `${u.department} (${u.team})`}
                         </div>
                       </div>
 
@@ -532,7 +540,7 @@ export const NOCAdminPageView: React.FC<NOCAdminPageViewProps> = ({
                     </h4>
                   </div>
                   <span className="text-[11px] text-slate-600 dark:text-neutral-400">
-                    Emails dispatched via Telekom Malaysia SMTP Gateway
+                    Emails dispatched via TM SMTP (System Email: <strong className="text-slate-800 dark:text-neutral-200">izzuldiniee@gmail.com</strong>)
                   </span>
                 </div>
 
@@ -558,7 +566,7 @@ export const NOCAdminPageView: React.FC<NOCAdminPageViewProps> = ({
                             </span>
                           </div>
                           <div className="text-[11px] text-slate-600 dark:text-neutral-400">
-                            Pre-assigned: <strong className="text-slate-800 dark:text-neutral-300">{inv.role === 'NOC_USER' ? 'NOC' : inv.roleTitle}</strong> &bull; {inv.department} ({formatUserTeam(inv.team, inv.role)}) &bull; Invited {inv.invitedAt} by {inv.invitedBy}
+                            Pre-assigned: <strong className="text-slate-800 dark:text-neutral-300">{inv.role === 'NOC_USER' ? 'NOC' : inv.roleTitle}</strong> &bull; {inv.role === 'NOC_USER' ? 'NOC' : `${inv.department} (${inv.team})`} &bull; Invited {inv.invitedAt} by {inv.invitedBy}
                           </div>
                           {inv.customNote && (
                             <div className="text-[11px] text-slate-600 dark:text-neutral-400 italic">
